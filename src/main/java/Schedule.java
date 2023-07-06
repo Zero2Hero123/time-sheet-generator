@@ -28,15 +28,16 @@ public class Schedule {
             }
             
             for(String job : jobs){
-                
-                int nameIdx = (int) (Math.random() * namesCopy.size());
-                
-                newSchedule.get(i).put(job,namesCopy.get(nameIdx));
-                namesCopy.remove(nameIdx);
 
                 if(namesCopy.size() == 0){
+                    newSchedule.get(i).put(job,"None");
                     break;
                 }
+                
+                int nameIdx = (int) (Math.random() * namesCopy.size());
+
+                newSchedule.get(i).put(job,namesCopy.get(nameIdx));
+                namesCopy.remove(nameIdx);
                 
             }
             
