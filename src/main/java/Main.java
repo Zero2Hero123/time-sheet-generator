@@ -1,6 +1,4 @@
 import java.util.ArrayList;
-import java.awt.Font;
-import javax.swing.JLabel;
 
 public class Main {
 
@@ -24,11 +22,7 @@ public class Main {
         // System.out.println(gen.generate(2));
 
         var window = new Window();
-        var title = new JLabel("Time Sheet Generator");
-        title.setFont(new Font("Helvetica",Font.PLAIN,30));
-        title.setHorizontalAlignment(JLabel.CENTER);
-        title.setVerticalAlignment(JLabel.TOP);
-        title.setBounds(0,0,900,100);
-        window.add(title);
+
+        
     }
 }
