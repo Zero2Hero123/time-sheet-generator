@@ -21,7 +21,7 @@ public class Main {
 
         // System.out.println(gen.generate(2));
 
-        var window = new Window();
+        new Window();
 
         
     }
