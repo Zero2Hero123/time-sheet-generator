@@ -37,6 +37,9 @@ public class Window extends JFrame implements ActionListener {
     private final Color fgColor = new Color(70, 78, 92);
     
     public Window(){
+        
+
+
         this.setSize(900,700);
         this.setLayout(new BorderLayout());
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
