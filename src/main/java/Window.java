@@ -1,3 +1,4 @@
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
@@ -41,6 +42,9 @@ public class Window extends JFrame implements ActionListener {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(true);
         this.setTitle("Time Sheet Generator");
+
+        ImageIcon logo = new ImageIcon("church_logo.png");
+        this.setIconImage(logo.getImage());
 
 
 
@@ -137,10 +141,11 @@ public class Window extends JFrame implements ActionListener {
         mainBody.setBackground(bgColor);
 
         
-
+        var mainBodyWithScroll = new JScrollPane(mainBody); // adds scrollbar to mainBody
+        mainBodyWithScroll.setBorder(null);
 
         this.add(header,BorderLayout.NORTH);
-        this.add(new JScrollPane(mainBody),BorderLayout.CENTER);
+        this.add(mainBodyWithScroll,BorderLayout.CENTER);
 
         this.setVisible(true);
     }
