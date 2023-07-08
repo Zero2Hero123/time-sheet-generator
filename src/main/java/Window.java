@@ -19,9 +19,11 @@ public class Window extends JFrame implements ActionListener {
 
     private JButton generateBtn;
 
+    private JPanel namesContainer;
     private JTextField nameInput;
     private JButton addNameBtn;
 
+    private JPanel jobsContainer;
     private JTextField jobInput;
     private JButton addJobBtn;
 
@@ -37,7 +39,7 @@ public class Window extends JFrame implements ActionListener {
 
 
         var title = new JLabel("Time Sheet Generator");
-        title.setFont(new Font("Comic Sans",Font.PLAIN,30));
+        title.setFont(new Font("Helvetica",Font.BOLD,30));
         title.setHorizontalAlignment(JLabel.CENTER);
 
         generateBtn = new JButton();
@@ -57,13 +59,13 @@ public class Window extends JFrame implements ActionListener {
         addJobBtn.addActionListener(this);
         addJobBtn.setPreferredSize(new Dimension(70,20));
 
-        var namesContainer = new JPanel();
+        namesContainer = new JPanel();
         namesContainer.setPreferredSize(new Dimension(300, 300));
         namesContainer.add(new JLabel("Names"));
         namesContainer.add(nameInput);
         namesContainer.add(addNameBtn);
 
-        var jobsContainer = new JPanel();
+        jobsContainer = new JPanel();
         jobsContainer.setPreferredSize(new Dimension(300, 300));
         jobsContainer.add(new JLabel("Jobs"));
         jobsContainer.add(jobInput);
@@ -111,10 +113,70 @@ public class Window extends JFrame implements ActionListener {
         } else if(e.getSource() == addNameBtn){
             names.add(nameInput.getText());
 
+            
+            // add a label and a remove-button for the new job added
+            JLabel newName = new JLabel(nameInput.getText());
+            newName.setPreferredSize(new Dimension(200, 30));
+            newName.setHorizontalAlignment(JLabel.CENTER);
+
+            JButton removeBtn = new JButton("X");
+            removeBtn.setPreferredSize(new Dimension(50, 30));
+            String currName = nameInput.getText(); // for action listener since nameInput.getText gets reset
+            removeBtn.addActionListener((ActionEvent event) -> {
+                
+                names.remove(currName);
+                
+                
+                namesContainer.remove(newName);
+                namesContainer.remove(removeBtn);
+
+                this.invalidate();
+                this.validate();
+                this.repaint();
+            });
+
+            namesContainer.add(newName);
+            namesContainer.add(removeBtn);
+
+            this.invalidate();
+            this.validate();
+            this.repaint();
+            
+            
+            
+            nameInput.setText("");
             System.out.println(names);
         } else if(e.getSource() == addJobBtn){
             jobs.add(jobInput.getText());
+            
+            // add a label and a remove-button for the new job added
+            JLabel newJob = new JLabel(jobInput.getText());
+            newJob.setPreferredSize(new Dimension(200, 30));
+            newJob.setHorizontalAlignment(JLabel.CENTER);
 
+            JButton removeBtn = new JButton("X");
+            removeBtn.setPreferredSize(new Dimension(50, 30));
+            String currJob = jobInput.getText(); // for action listener since jobInput.getText gets reset
+            removeBtn.addActionListener((ActionEvent event) -> {
+                jobs.remove(currJob);
+                
+                
+                jobsContainer.remove(newJob);
+                jobsContainer.remove(removeBtn);
+
+                this.invalidate();
+                this.validate();
+                this.repaint();
+            });
+
+            jobsContainer.add(newJob);
+            jobsContainer.add(removeBtn);
+            
+            jobInput.setText("");
+
+            this.invalidate();
+            this.validate();
+            this.repaint();
             System.out.println(jobs);
         }
 
