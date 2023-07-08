@@ -11,7 +11,9 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.border.Border;
 
 import java.util.ArrayList;
 
@@ -29,6 +31,9 @@ public class Window extends JFrame implements ActionListener {
 
     private ArrayList<String> names = new ArrayList<String>();
     private ArrayList<String> jobs = new ArrayList<String>();
+
+    private final Color bgColor = new Color(38, 43, 51);
+    private final Color fgColor = new Color(70, 78, 92);
     
     public Window(){
         this.setSize(900,700);
@@ -38,53 +43,87 @@ public class Window extends JFrame implements ActionListener {
         this.setTitle("Time Sheet Generator");
 
 
+
         var title = new JLabel("Time Sheet Generator");
         title.setFont(new Font("Helvetica",Font.BOLD,30));
         title.setHorizontalAlignment(JLabel.CENTER);
+        title.setForeground(Color.WHITE);
+        title.setBackground(bgColor);
+        title.setOpaque(true);
 
         generateBtn = new JButton();
         generateBtn.setText("Generate");
         generateBtn.addActionListener(this);
         generateBtn.setFocusable(false);
+        generateBtn.setBackground(new Color(88, 98, 115));
+        generateBtn.setForeground(Color.WHITE);
 
-        nameInput = new JTextField();
+        nameInput = new JTextField(){
+            @Override public void setBorder(Border border) {
+                // No border
+            }
+        };
         nameInput.setPreferredSize(new Dimension(100,20));
+        nameInput.setBackground(new Color(22, 25, 31));
+        nameInput.setForeground(Color.WHITE);
+        nameInput.setCaretColor(Color.WHITE);
+
         addNameBtn = new JButton("Add");
         addNameBtn.addActionListener(this);
         addNameBtn.setPreferredSize(new Dimension(70,20));
+        addNameBtn.setBackground(new Color(88, 98, 115));
+        addNameBtn.setForeground(Color.WHITE);
 
-        jobInput = new JTextField();
+        jobInput = new JTextField(){
+            @Override public void setBorder(Border border) {
+                // No border
+            }
+        };
         jobInput.setPreferredSize(new Dimension(100,20));
+        jobInput.setBackground(new Color(22, 25, 31));
+        jobInput.setForeground(Color.WHITE);
+        jobInput.setCaretColor(Color.WHITE);
+
         addJobBtn = new JButton("Add");
         addJobBtn.addActionListener(this);
         addJobBtn.setPreferredSize(new Dimension(70,20));
+        addJobBtn.setBackground(new Color(88, 98, 115));
+        addJobBtn.setForeground(Color.WHITE);
+
 
         namesContainer = new JPanel();
         namesContainer.setPreferredSize(new Dimension(300, 300));
-        namesContainer.add(new JLabel("Names"));
+        namesContainer.setBackground(fgColor);
+        var namesLabel = new JLabel("Names");
+        namesLabel.setForeground(Color.WHITE);
+        namesContainer.add(namesLabel);
         namesContainer.add(nameInput);
         namesContainer.add(addNameBtn);
 
         jobsContainer = new JPanel();
         jobsContainer.setPreferredSize(new Dimension(300, 300));
-        jobsContainer.add(new JLabel("Jobs"));
+        jobsContainer.setBackground(fgColor);
+        var jobsLabel = new JLabel("Jobs");
+        jobsLabel.setForeground(Color.WHITE);
+        jobsContainer.add(jobsLabel);
         jobsContainer.add(jobInput);
         jobsContainer.add(addJobBtn);
 
 
         JPanel settingsBody = new JPanel(); // config for time sheet generation
-        settingsBody.setBackground(Color.lightGray);
+        settingsBody.setBackground(bgColor);
         settingsBody.setPreferredSize(new Dimension(this.getWidth(), 300));
         settingsBody.add(namesContainer);
         settingsBody.add(jobsContainer);
 
         JPanel sheetGrid = new JPanel();
         sheetGrid.setLayout(new GridLayout(5, 3));
-        sheetGrid.setPreferredSize(new Dimension(this.getWidth() / 3, 900));
-        sheetGrid.setBackground(Color.CYAN);
+        sheetGrid.setPreferredSize(new Dimension(816, 1000));
+        sheetGrid.setBackground(Color.white);
 
 
         var lowerHeader = new JPanel(); // Jpanel in SOUTH of header to achieve centered generate-button
+        lowerHeader.setBackground(bgColor);
         lowerHeader.add(generateBtn);
 
         JPanel header = new JPanel(); // top-header to hold title and settingsBody
@@ -95,13 +134,13 @@ public class Window extends JFrame implements ActionListener {
 
         JPanel mainBody = new JPanel(); //container of generated schedule 
         mainBody.add(sheetGrid);
-        mainBody.setBackground(Color.BLUE);
+        mainBody.setBackground(bgColor);
 
         
 
 
         this.add(header,BorderLayout.NORTH);
-        this.add(mainBody,BorderLayout.CENTER);
+        this.add(new JScrollPane(mainBody),BorderLayout.CENTER);
 
         this.setVisible(true);
     }
@@ -118,9 +157,13 @@ public class Window extends JFrame implements ActionListener {
             JLabel newName = new JLabel(nameInput.getText());
             newName.setPreferredSize(new Dimension(200, 30));
             newName.setHorizontalAlignment(JLabel.CENTER);
+            newName.setForeground(Color.WHITE);
 
             JButton removeBtn = new JButton("X");
             removeBtn.setPreferredSize(new Dimension(50, 30));
+            removeBtn.setBackground(new Color(189, 58, 58));
+            removeBtn.setForeground(Color.WHITE);
+            
             String currName = nameInput.getText(); // for action listener since nameInput.getText gets reset
             removeBtn.addActionListener((ActionEvent event) -> {
                 
@@ -145,6 +188,7 @@ public class Window extends JFrame implements ActionListener {
             
             
             nameInput.setText("");
+            nameInput.grabFocus();
             System.out.println(names);
         } else if(e.getSource() == addJobBtn){
             jobs.add(jobInput.getText());
@@ -153,9 +197,13 @@ public class Window extends JFrame implements ActionListener {
             JLabel newJob = new JLabel(jobInput.getText());
             newJob.setPreferredSize(new Dimension(200, 30));
             newJob.setHorizontalAlignment(JLabel.CENTER);
+            newJob.setForeground(Color.WHITE);
 
             JButton removeBtn = new JButton("X");
             removeBtn.setPreferredSize(new Dimension(50, 30));
+            removeBtn.setBackground(new Color(189, 58, 58));
+            removeBtn.setForeground(Color.WHITE);
+
             String currJob = jobInput.getText(); // for action listener since jobInput.getText gets reset
             removeBtn.addActionListener((ActionEvent event) -> {
                 jobs.remove(currJob);
@@ -171,12 +219,14 @@ public class Window extends JFrame implements ActionListener {
 
             jobsContainer.add(newJob);
             jobsContainer.add(removeBtn);
-            
-            jobInput.setText("");
 
             this.invalidate();
             this.validate();
             this.repaint();
+            
+            jobInput.grabFocus();
+            jobInput.setText("");
+
             System.out.println(jobs);
         }
 
