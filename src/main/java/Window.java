@@ -24,12 +24,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Window extends JFrame implements ActionListener {
 
+    private JPanel sheetGrid;
     private JButton generateBtn;
 
     private JPanel namesContainer;
@@ -165,10 +168,11 @@ public class Window extends JFrame implements ActionListener {
         settingsBody.add(namesContainer);
         settingsBody.add(jobsContainer);
 
-        JPanel sheetGrid = new JPanel();
+        sheetGrid = new JPanel();
         sheetGrid.setLayout(new GridLayout(5, 3));
         sheetGrid.setPreferredSize(new Dimension(816, 1000));
         sheetGrid.setBackground(Color.white);
+        sheetGrid.setBorder(new EmptyBorder(96,96,96,96));
 
 
         var lowerHeader = new JPanel(); // Jpanel in SOUTH of header to achieve centered generate-button
@@ -212,16 +216,56 @@ public class Window extends JFrame implements ActionListener {
     
     public void actionPerformed(ActionEvent e){
         if(e.getSource() == generateBtn){
-            
+            sheetGrid.removeAll();
+
+            ArrayList<String> nextSundayDates = Schedule.nextSundays(5);
+
             System.out.println("Generating...");
 
             Schedule newSchedule = new Schedule(names, jobs);
             
             currSchedule = newSchedule.generate(5);
+            
+            int dayIndex = 0;
+            for(HashMap<String,String> day : currSchedule){
+                var firstColumn = new JPanel();
+                firstColumn.setBorder(new LineBorder(Color.BLACK,1));
+                for(String key : day.keySet()){
+                    String jobString = String.format("%s - %s",day.get(key),key);
+                    JLabel line = new JLabel(jobString);
+                    line.setFont(new Font("Helvetica",Font.PLAIN,15));
+                    line.setPreferredSize(new Dimension(200,15));
 
-            System.out.println(currSchedule);
+                    firstColumn.add(line);
+
+                }
+                sheetGrid.add(firstColumn);
+
+                var secondColumn = new JPanel();
+                JLabel date = new JLabel(nextSundayDates.get(dayIndex));
+                date.setFont(new Font("Helvetica",Font.PLAIN,15));
+                date.setPreferredSize(new Dimension(200,15));
+                secondColumn.add(date);
+
+                secondColumn.setBorder(new LineBorder(Color.BLACK,1));
+
+                sheetGrid.add(secondColumn);
+
+                var thirdColumn = new JPanel();
+                thirdColumn.setBorder(new LineBorder(Color.BLACK,1));
+                JLabel line = new JLabel("[Supervising Here]");
+                line.setFont(new Font("Helvetica",Font.PLAIN,15));
+                line.setPreferredSize(new Dimension(200,15));
+                thirdColumn.add(line);
+                sheetGrid.add(thirdColumn);
 
 
+                dayIndex++;
+            }
+
+            this.invalidate();
+            this.validate();
+            this.repaint();
         } else if(e.getSource() == addNameBtn){
             
             addName(nameInput.getText());
@@ -248,7 +292,7 @@ public class Window extends JFrame implements ActionListener {
 
             if(namesRaw == null || jobsRaw == null){
                 System.out.println("Save-Data File is empty");
-                
+
                 return;
             }
 

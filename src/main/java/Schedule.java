@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 
 public class Schedule {
@@ -10,6 +13,33 @@ public class Schedule {
     public Schedule(ArrayList<String> names, ArrayList<String> jobs){
         this.names = names;
         this.jobs = jobs;
+    }
+
+    public static ArrayList<String> nextSundays(int howMany){
+        LocalDate today = LocalDate.now();
+        LocalDate nextSunday = today;
+
+        ArrayList<String> nextSundaysFormatted = new ArrayList<String>();
+
+        while(nextSunday.getDayOfWeek() != DayOfWeek.SUNDAY){
+            nextSunday = nextSunday.plusDays(1);
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd");
+
+        if(nextSunday.equals(LocalDate.now())){
+            nextSunday = nextSunday.plusDays(7);
+        }
+
+        for(int i=0;i<howMany;i++){
+            nextSundaysFormatted.add(nextSunday.format(formatter));
+
+            nextSunday = nextSunday.plusDays(7);
+        }
+
+
+
+        return nextSundaysFormatted;
     }
 
     public ArrayList<HashMap<String,String>> generate(int numDays){
