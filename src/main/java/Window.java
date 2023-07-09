@@ -9,6 +9,15 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -40,6 +49,36 @@ public class Window extends JFrame implements ActionListener {
     private ArrayList<HashMap<String,String>> currSchedule;
     
     public Window(){
+
+        this.addWindowListener(new WindowAdapter() {
+            
+            @Override
+            public void windowClosing(WindowEvent event){
+
+
+                // Save names and jobs to file system
+                if(System.getProperty("os.name").startsWith("Windows")){
+
+                    try {
+                        BufferedWriter writer = new BufferedWriter(new FileWriter("C:\\ProgramData\\names_jobs_data.txt"));
+
+                        for(String name : names){
+                            writer.write(name+",");
+                        }
+                        writer.write("\n");
+
+                        for(String job : jobs){
+                            writer.write(job+",");
+                        }
+
+                        writer.close();
+                    } catch(IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                
+            }
+        });
         
 
 
@@ -153,6 +192,20 @@ public class Window extends JFrame implements ActionListener {
         this.add(header,BorderLayout.NORTH);
         this.add(mainBodyWithScroll,BorderLayout.CENTER);
 
+        if(System.getProperty("os.name").startsWith("Windows")){
+            File file = new File("C:\\ProgramData\\names_jobs_data.txt");
+            if(file.exists()){
+                try{
+                    loadData(new BufferedReader(new FileReader("C:\\ProgramData\\names_jobs_data.txt")));
+                } catch (FileNotFoundException e){
+                    System.out.println("ERROR: Save Data Not Found");
+                }
+            } else {
+                System.out.println(false);
+            }
+
+        }
+
         this.setVisible(true);
     }
 
@@ -170,79 +223,14 @@ public class Window extends JFrame implements ActionListener {
 
 
         } else if(e.getSource() == addNameBtn){
-            names.add(nameInput.getText());
-
             
-            // add a label and a remove-button for the new job added
-            JLabel newName = new JLabel(nameInput.getText());
-            newName.setPreferredSize(new Dimension(200, 30));
-            newName.setHorizontalAlignment(JLabel.CENTER);
-            newName.setForeground(Color.WHITE);
-
-            JButton removeBtn = new JButton("X");
-            removeBtn.setPreferredSize(new Dimension(50, 30));
-            removeBtn.setBackground(new Color(189, 58, 58));
-            removeBtn.setForeground(Color.WHITE);
-            
-            String currName = nameInput.getText(); // for action listener since nameInput.getText gets reset
-            removeBtn.addActionListener((ActionEvent event) -> {
-                
-                names.remove(currName);
-                
-                
-                namesContainer.remove(newName);
-                namesContainer.remove(removeBtn);
-
-                this.invalidate();
-                this.validate();
-                this.repaint();
-            });
-
-            namesContainer.add(newName);
-            namesContainer.add(removeBtn);
-
-            this.invalidate();
-            this.validate();
-            this.repaint();
-            
-            
+            addName(nameInput.getText());
             
             nameInput.setText("");
             nameInput.grabFocus();
             System.out.println(names);
         } else if(e.getSource() == addJobBtn){
-            jobs.add(jobInput.getText());
-            
-            // add a label and a remove-button for the new job added
-            JLabel newJob = new JLabel(jobInput.getText());
-            newJob.setPreferredSize(new Dimension(200, 30));
-            newJob.setHorizontalAlignment(JLabel.CENTER);
-            newJob.setForeground(Color.WHITE);
-
-            JButton removeBtn = new JButton("X");
-            removeBtn.setPreferredSize(new Dimension(50, 30));
-            removeBtn.setBackground(new Color(189, 58, 58));
-            removeBtn.setForeground(Color.WHITE);
-
-            String currJob = jobInput.getText(); // for action listener since jobInput.getText gets reset
-            removeBtn.addActionListener((ActionEvent event) -> {
-                jobs.remove(currJob);
-                
-                
-                jobsContainer.remove(newJob);
-                jobsContainer.remove(removeBtn);
-
-                this.invalidate();
-                this.validate();
-                this.repaint();
-            });
-
-            jobsContainer.add(newJob);
-            jobsContainer.add(removeBtn);
-
-            this.invalidate();
-            this.validate();
-            this.repaint();
+            addJob(jobInput.getText());
             
             jobInput.grabFocus();
             jobInput.setText("");
@@ -250,7 +238,108 @@ public class Window extends JFrame implements ActionListener {
             System.out.println(jobs);
         }
 
+        
+    }
 
+    private void loadData(BufferedReader reader){
+        try{
+            String namesRaw = reader.readLine();
+            String jobsRaw = reader.readLine();
+
+            if(namesRaw == null || jobsRaw == null){
+                System.out.println("Save-Data File is empty");
+                
+                return;
+            }
+
+            for(String name : namesRaw.split(",")){
+                addName(name);
+            }
+
+            for(String job : jobsRaw.split(",")){
+                addJob(job);
+            }
+
+
+            reader.close();
+
+        } catch (IOException e){
+            System.out.println(e);
+        }
+
+
+    }
+
+    private void addJob(String jobName){
+        jobs.add(jobName);
+            
+        // add a label and a remove-button for the new job added
+        JLabel newJob = new JLabel(jobName);
+        newJob.setPreferredSize(new Dimension(200, 30));
+        newJob.setHorizontalAlignment(JLabel.CENTER);
+        newJob.setForeground(Color.WHITE);
+
+        JButton removeBtn = new JButton("X");
+        removeBtn.setPreferredSize(new Dimension(50, 30));
+        removeBtn.setBackground(new Color(189, 58, 58));
+        removeBtn.setForeground(Color.WHITE);
+
+        String currJob = jobName;
+        removeBtn.addActionListener((ActionEvent event) -> {
+            jobs.remove(currJob);
+            
+            
+            jobsContainer.remove(newJob);
+            jobsContainer.remove(removeBtn);
+
+            this.invalidate();
+            this.validate();
+            this.repaint();
+        });
+
+        jobsContainer.add(newJob);
+        jobsContainer.add(removeBtn);
+
+        this.invalidate();
+        this.validate();
+        this.repaint();
+    }
+
+    private void addName(String memberName){
+        names.add(memberName);
+
+            
+        // add a label and a remove-button for the new job added
+        JLabel newName = new JLabel(memberName);
+        newName.setPreferredSize(new Dimension(200, 30));
+        newName.setHorizontalAlignment(JLabel.CENTER);
+        newName.setForeground(Color.WHITE);
+
+        JButton removeBtn = new JButton("X");
+        removeBtn.setPreferredSize(new Dimension(50, 30));
+        removeBtn.setBackground(new Color(189, 58, 58));
+        removeBtn.setForeground(Color.WHITE);
+        
+        String currName = memberName; // for action listener since nameInput.getText gets reset
+        removeBtn.addActionListener((ActionEvent event) -> {
+            
+            names.remove(currName);
+            
+            
+            namesContainer.remove(newName);
+            namesContainer.remove(removeBtn);
+
+            this.invalidate();
+            this.validate();
+            this.repaint();
+        });
+
+        namesContainer.add(newName);
+        namesContainer.add(removeBtn);
+
+        this.invalidate();
+        this.validate();
+        this.repaint();
     }
 
 }

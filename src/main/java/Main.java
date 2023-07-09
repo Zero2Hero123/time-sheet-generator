@@ -19,18 +19,6 @@ public class Main {
             System.out.println("unsupported");
         }
 
-
-        // LookAndFeelInfo selected = null;
-        // for (LookAndFeelInfo lafInfo : UIManager.getInstalledLookAndFeels()) {
-        //     System.out.println(lafInfo.getName());
-        //     if (lafInfo.getName().equals(UIManager.getLookAndFeel().getName())) {
-        //         selected = lafInfo;
-        //     }
-        // }
-        // System.out.print("Selected UIManager: ");
-        // System.out.println(selected.getName());
-
-
         new Window();
 
         
