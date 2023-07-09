@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 import javax.swing.border.Border;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Window extends JFrame implements ActionListener {
 
@@ -35,6 +36,8 @@ public class Window extends JFrame implements ActionListener {
 
     private final Color bgColor = new Color(38, 43, 51);
     private final Color fgColor = new Color(70, 78, 92);
+
+    private ArrayList<HashMap<String,String>> currSchedule;
     
     public Window(){
         
@@ -156,7 +159,16 @@ public class Window extends JFrame implements ActionListener {
     
     public void actionPerformed(ActionEvent e){
         if(e.getSource() == generateBtn){
+            
             System.out.println("Generating...");
+
+            Schedule newSchedule = new Schedule(names, jobs);
+            
+            currSchedule = newSchedule.generate(5);
+
+            System.out.println(currSchedule);
+
+
         } else if(e.getSource() == addNameBtn){
             names.add(nameInput.getText());
 

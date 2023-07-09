@@ -1,30 +1,12 @@
-import java.util.ArrayList;
 
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.UIManager.LookAndFeelInfo;
+
+import java.io.File;
 
 public class Main {
 
     public static void main(String[] args){
-
-        var arr = new ArrayList<String>();
-        arr.add("Hero");
-        arr.add("Joshua");
-        arr.add("Ruth");
-        arr.add("Oserame");
-
-        var jobs = new ArrayList<String>();
-        jobs.add("Audio Mixer");
-        jobs.add("Camera");
-        jobs.add("Video Switcher");
-        jobs.add("Propresenter");
-        jobs.add("Vmix");
-
-        // var gen = new Schedule(arr,jobs);
-
-        // System.out.println(gen.generate(2));
-
         try {
             UIManager.setLookAndFeel(UIManager.getInstalledLookAndFeels()[0].getClassName());
         } catch (ClassNotFoundException e){
@@ -37,6 +19,7 @@ public class Main {
             System.out.println("unsupported");
         }
 
+
         // LookAndFeelInfo selected = null;
         // for (LookAndFeelInfo lafInfo : UIManager.getInstalledLookAndFeels()) {
         //     System.out.println(lafInfo.getName());
@@ -46,6 +29,7 @@ public class Main {
         // }
         // System.out.print("Selected UIManager: ");
         // System.out.println(selected.getName());
+
 
         new Window();
 
