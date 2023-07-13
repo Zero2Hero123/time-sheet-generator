@@ -35,6 +35,8 @@ public class Window extends JFrame implements ActionListener {
     private JPanel sheetGrid;
     private JButton generateBtn;
 
+    private JButton printBtn;
+
     private JPanel namesContainer;
     private JTextField nameInput;
     private JButton addNameBtn;
@@ -110,6 +112,19 @@ public class Window extends JFrame implements ActionListener {
         generateBtn.setBackground(new Color(88, 98, 115));
         generateBtn.setForeground(Color.WHITE);
 
+        printBtn = new JButton();
+        printBtn.setText("Print");
+        printBtn.addActionListener(this);
+        printBtn.setFocusable(false);
+        printBtn.setBackground(new Color(88, 98, 115));
+        printBtn.setForeground(Color.WHITE);
+
+        printBtn.addActionListener((e) -> {
+            Printer printer = new Printer(sheetGrid);
+
+            printer.printSchedule();
+        });
+
         nameInput = new JTextField(){
             @Override public void setBorder(Border border) {
                 // No border
@@ -178,6 +193,7 @@ public class Window extends JFrame implements ActionListener {
         var lowerHeader = new JPanel(); // Jpanel in SOUTH of header to achieve centered generate-button
         lowerHeader.setBackground(bgColor);
         lowerHeader.add(generateBtn);
+        lowerHeader.add(printBtn);
 
         JPanel header = new JPanel(); // top-header to hold title and settingsBody
         header.setLayout(new BorderLayout());
