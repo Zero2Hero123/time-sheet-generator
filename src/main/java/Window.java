@@ -129,7 +129,7 @@ public class Window extends JFrame implements ActionListener {
         printBtn.setForeground(Color.WHITE);
 
         printBtn.addActionListener((e) -> {
-            Printer printer = new Printer(sheets.get(0));
+            Printer printer = new Printer(sheets);
 
             printer.printSchedule();
         });
