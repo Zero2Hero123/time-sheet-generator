@@ -22,17 +22,24 @@ import java.io.IOException;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class Window extends JFrame implements ActionListener {
 
-    private JPanel sheetGrid;
+
+    private JPanel mainBody = new JPanel();
+    private ArrayList<JPanel> sheets = new ArrayList<JPanel>();
+
+
     private JButton generateBtn;
 
     private JButton printBtn;
@@ -50,6 +57,8 @@ public class Window extends JFrame implements ActionListener {
 
     private final Color bgColor = new Color(38, 43, 51);
     private final Color fgColor = new Color(70, 78, 92);
+
+    private int numDays = 5;
 
     private ArrayList<HashMap<String,String>> currSchedule;
     
@@ -120,7 +129,7 @@ public class Window extends JFrame implements ActionListener {
         printBtn.setForeground(Color.WHITE);
 
         printBtn.addActionListener((e) -> {
-            Printer printer = new Printer(sheetGrid);
+            Printer printer = new Printer(sheets.get(0));
 
             printer.printSchedule();
         });
@@ -176,18 +185,37 @@ public class Window extends JFrame implements ActionListener {
         jobsContainer.add(jobInput);
         jobsContainer.add(addJobBtn);
 
+        JSlider daysSlider = new JSlider(5,20,5);
+        daysSlider.setOrientation(SwingConstants.VERTICAL);
+        daysSlider.setPreferredSize(new Dimension(100, 230));
+        daysSlider.setBackground(fgColor);
+        daysSlider.setForeground(Color.WHITE);
+
+        daysSlider.setPaintTrack(true);
+        daysSlider.setMajorTickSpacing(5);
+        daysSlider.setPaintLabels(true);
+
+
+        JPanel sliderContainer = new JPanel();
+        sliderContainer.setPreferredSize(new Dimension(100, 300));
+        sliderContainer.setBackground(fgColor);
+        var daysLabel = new JLabel("<html>Number of<br/> Sundays <br>5</html>");
+        daysLabel.setForeground(Color.WHITE);
+        daysSlider.addChangeListener((e) -> {
+            numDays = daysSlider.getValue();
+            
+            daysLabel.setText("<html>Number of<br/> Sundays <br>"+numDays+"</html>");
+        });
+        sliderContainer.add(daysLabel);
+        sliderContainer.add(daysSlider);
+
 
         JPanel settingsBody = new JPanel(); // config for time sheet generation
         settingsBody.setBackground(bgColor);
         settingsBody.setPreferredSize(new Dimension(this.getWidth(), 300));
+        settingsBody.add(sliderContainer);
         settingsBody.add(namesContainer);
         settingsBody.add(jobsContainer);
-
-        sheetGrid = new JPanel();
-        sheetGrid.setLayout(new GridLayout(5, 3));
-        sheetGrid.setPreferredSize(new Dimension(816, 1000));
-        sheetGrid.setBackground(Color.white);
-        sheetGrid.setBorder(new EmptyBorder(96,96,96,96));
 
 
         var lowerHeader = new JPanel(); // Jpanel in SOUTH of header to achieve centered generate-button
@@ -201,8 +229,10 @@ public class Window extends JFrame implements ActionListener {
         header.add(settingsBody,BorderLayout.CENTER);
         header.add(lowerHeader,BorderLayout.SOUTH);
 
-        JPanel mainBody = new JPanel(); //container of generated schedule 
-        mainBody.add(sheetGrid);
+        sheets.add(createSheetGrid());
+
+        //container of generated schedule 
+        mainBody.add(sheets.get(0));
         mainBody.setBackground(bgColor);
 
         
@@ -232,17 +262,32 @@ public class Window extends JFrame implements ActionListener {
     
     public void actionPerformed(ActionEvent e){
         if(e.getSource() == generateBtn){
-            sheetGrid.removeAll();
+            Iterator<JPanel> it = sheets.iterator();
+            while(it.hasNext()){
+                JPanel curr = it.next();
+                mainBody.remove(curr);
+                it.remove();
+            }
+            
+                
+            int pagesNeeded = (int) (Math.ceil((double) numDays/5));
 
-            ArrayList<String> nextSundayDates = Schedule.nextSundays(5);
+            for(int i=0;i<pagesNeeded;i++){
+                createSheetGrid();
+            }
+
+            ArrayList<String> nextSundayDates = Schedule.nextSundays(numDays);
 
             System.out.println("Generating...");
 
             Schedule newSchedule = new Schedule(names, jobs);
             
-            currSchedule = newSchedule.generate(5);
+            currSchedule = newSchedule.generate(numDays);
             
             int dayIndex = 0;
+            int dayCounter = 0;
+            int sheetIdx = 0;
+
             for(HashMap<String,String> day : currSchedule){
                 var firstColumn = new JPanel();
                 firstColumn.setBorder(new LineBorder(Color.BLACK,1));
@@ -255,7 +300,8 @@ public class Window extends JFrame implements ActionListener {
                     firstColumn.add(line);
 
                 }
-                sheetGrid.add(firstColumn);
+                
+                sheets.get(sheetIdx).add(firstColumn);
 
                 var secondColumn = new JPanel();
                 JLabel date = new JLabel(nextSundayDates.get(dayIndex));
@@ -265,7 +311,7 @@ public class Window extends JFrame implements ActionListener {
 
                 secondColumn.setBorder(new LineBorder(Color.BLACK,1));
 
-                sheetGrid.add(secondColumn);
+                sheets.get(sheetIdx).add(secondColumn);
 
                 var thirdColumn = new JPanel();
                 thirdColumn.setBorder(new LineBorder(Color.BLACK,1));
@@ -273,10 +319,17 @@ public class Window extends JFrame implements ActionListener {
                 line.setFont(new Font("Helvetica",Font.PLAIN,15));
                 line.setPreferredSize(new Dimension(200,15));
                 thirdColumn.add(line);
-                sheetGrid.add(thirdColumn);
+                sheets.get(sheetIdx).add(thirdColumn);
 
 
                 dayIndex++;
+                dayCounter++;
+
+                if(dayCounter >= 5){
+                    sheetIdx++;
+
+                    dayCounter = 0;
+                }
             }
 
             this.invalidate();
@@ -400,6 +453,19 @@ public class Window extends JFrame implements ActionListener {
         this.invalidate();
         this.validate();
         this.repaint();
+    }
+
+    private JPanel createSheetGrid() {
+        JPanel sheetGrid = new JPanel();
+        sheetGrid.setLayout(new GridLayout(5, 3));
+        sheetGrid.setPreferredSize(new Dimension(816, 1000));
+        sheetGrid.setBackground(Color.white);
+        sheetGrid.setBorder(new EmptyBorder(96,96,96,96));
+
+        sheets.add(sheetGrid);
+        mainBody.add(sheetGrid);
+
+        return sheetGrid;
     }
 
 }
