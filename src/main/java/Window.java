@@ -263,6 +263,10 @@ public class Window extends JFrame implements ActionListener {
     
     public void actionPerformed(ActionEvent e){
         if(e.getSource() == generateBtn){
+            if(names.size() == 0 || jobs.size() == 0){
+                return;
+            }
+
             Iterator<JPanel> it = sheets.iterator();
             while(it.hasNext()){
                 JPanel curr = it.next();
