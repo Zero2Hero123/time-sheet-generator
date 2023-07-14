@@ -210,6 +210,13 @@ public class Window extends JFrame implements ActionListener {
         sliderContainer.add(daysLabel);
         sliderContainer.add(daysSlider);
 
+        JPanel taskPercentageContainer = new JPanel();
+        taskPercentageContainer.setPreferredSize(new Dimension(300, 300));
+        taskPercentageContainer.setBackground(fgColor);
+        var percentageLabel = new JLabel("Job Assignment Percentage");
+        percentageLabel.setForeground(Color.WHITE);
+        taskPercentageContainer.add(percentageLabel);
+
 
         JPanel settingsBody = new JPanel(); // config for time sheet generation
         settingsBody.setBackground(bgColor);
@@ -217,6 +224,7 @@ public class Window extends JFrame implements ActionListener {
         settingsBody.add(sliderContainer);
         settingsBody.add(namesContainer);
         settingsBody.add(jobsContainer);
+        settingsBody.add(taskPercentageContainer);
 
 
         var lowerHeader = new JPanel(); // Jpanel in SOUTH of header to achieve centered generate-button
@@ -454,6 +462,7 @@ public class Window extends JFrame implements ActionListener {
         String currName = memberName; // for action listener since nameInput.getText gets reset
         removeBtn.addActionListener((ActionEvent event) -> {
             
+            priorityNames.remove(currName);
             names.remove(currName);
             
             
