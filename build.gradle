@@ -1,5 +1,6 @@
 plugins {
-    id 'java'
+    id 'java' 
+    id "edu.sc.seis.launch4j" version "3.0.3"
 }
 
 jar {
@@ -7,3 +8,11 @@ jar {
         attributes 'Main-Class': 'Main'
     }
 }
+
+repositories {
+    mavenCentral()
+}
+
+// dependencies {
+//     implementation 'net.sf.launch4j:launch4j:3.50'
+// }
