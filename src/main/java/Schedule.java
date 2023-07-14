@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -7,12 +8,21 @@ import java.time.format.DateTimeFormatter;
 
 public class Schedule {
 
+    private ArrayList<String> priorityNames;
     private ArrayList<String> names;
     private ArrayList<String> jobs;
+
+
 
     public Schedule(ArrayList<String> names, ArrayList<String> jobs){
         this.names = names;
         this.jobs = jobs;
+    }
+
+    public Schedule(ArrayList<String> names, ArrayList<String> jobs,ArrayList<String> priorityNames){
+        this.names = names;
+        this.jobs = jobs;
+        this.priorityNames = priorityNames;
     }
 
     public static ArrayList<String> nextSundays(int howMany){
@@ -51,17 +61,41 @@ public class Schedule {
         
         // for each day, generate random
         for(int i = 0; i < numDays; i++){
-
             ArrayList<String> namesCopy = new ArrayList<String>();
             for(String name : names){
                 namesCopy.add(name);
             }
+
+            ArrayList<String> priorityNamesCopy = new ArrayList<String>();
+            if(priorityNames != null){
+                for(String name : priorityNames){
+                    priorityNamesCopy.add(name);
+                }
+            }
+
+            Iterator<String> priorityIt = priorityNamesCopy.iterator();
+
             
             for(String job : jobs){
+                if(newSchedule.get(i).containsKey(job)){
+                    continue;
+                }
 
                 if(namesCopy.size() == 0){
                     newSchedule.get(i).put(job,"None");
                     break;
+                }
+
+                if(priorityIt.hasNext()){
+                    int jobIdx = (int) (Math.random() * jobs.size());
+
+                    String priorityName = priorityIt.next();
+                    newSchedule.get(i).put(jobs.get(jobIdx),priorityName);
+                    namesCopy.remove(priorityName);
+
+                    if(job == jobs.get(jobIdx)){
+                        continue;
+                    }
                 }
                 
                 int nameIdx = (int) (Math.random() * namesCopy.size());

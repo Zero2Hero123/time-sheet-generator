@@ -52,6 +52,7 @@ public class Window extends JFrame implements ActionListener {
     private JTextField jobInput;
     private JButton addJobBtn;
 
+    private ArrayList<String> priorityNames = new ArrayList<String>();
     private ArrayList<String> names = new ArrayList<String>();
     private ArrayList<String> jobs = new ArrayList<String>();
 
@@ -280,7 +281,13 @@ public class Window extends JFrame implements ActionListener {
 
             System.out.println("Generating...");
 
-            Schedule newSchedule = new Schedule(names, jobs);
+            Schedule newSchedule;
+
+            if(priorityNames.size() > 0){
+                newSchedule = new Schedule(names, jobs,priorityNames);
+            } else {
+                newSchedule = new Schedule(names, jobs);
+            }
             
             currSchedule = newSchedule.generate(numDays);
             
@@ -424,14 +431,21 @@ public class Window extends JFrame implements ActionListener {
             
         // add a label and a remove-button for the new job added
         JLabel newName = new JLabel(memberName);
-        newName.setPreferredSize(new Dimension(200, 30));
+        newName.setPreferredSize(new Dimension(150, 30));
         newName.setHorizontalAlignment(JLabel.CENTER);
         newName.setForeground(Color.WHITE);
+
+        JButton priorityBtn = new JButton("*");
+        priorityBtn.setPreferredSize(new Dimension(50, 30));
+        priorityBtn.setBackground(Color.DARK_GRAY);
+        priorityBtn.setForeground(Color.WHITE);
+        priorityBtn.setFocusable(false);
 
         JButton removeBtn = new JButton("X");
         removeBtn.setPreferredSize(new Dimension(50, 30));
         removeBtn.setBackground(new Color(189, 58, 58));
         removeBtn.setForeground(Color.WHITE);
+
         
         String currName = memberName; // for action listener since nameInput.getText gets reset
         removeBtn.addActionListener((ActionEvent event) -> {
@@ -440,14 +454,29 @@ public class Window extends JFrame implements ActionListener {
             
             
             namesContainer.remove(newName);
+            namesContainer.remove(priorityBtn);
             namesContainer.remove(removeBtn);
+            
 
             this.invalidate();
             this.validate();
             this.repaint();
         });
 
+        priorityBtn.addActionListener(e -> {
+            if(priorityNames.contains(currName)){
+                priorityNames.remove(currName);
+                priorityBtn.setBackground(Color.DARK_GRAY);
+            } else {
+                priorityNames.add(currName);
+                priorityBtn.setBackground(new Color(36, 117, 163));
+            }
+
+            System.out.printf("Priority names %s\n",priorityNames);
+        });
+
         namesContainer.add(newName);
+        namesContainer.add(priorityBtn);
         namesContainer.add(removeBtn);
 
         this.invalidate();
