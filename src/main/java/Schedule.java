@@ -12,6 +12,8 @@ public class Schedule {
     private ArrayList<String> names;
     private ArrayList<String> jobs;
 
+    private HashMap<String,HashMap<String,Integer>> chances;
+
 
 
     public Schedule(ArrayList<String> names, ArrayList<String> jobs){
@@ -23,6 +25,14 @@ public class Schedule {
         this.names = names;
         this.jobs = jobs;
         this.priorityNames = priorityNames;
+    }
+
+    public Schedule(ArrayList<String> names, ArrayList<String> jobs,ArrayList<String> priorityNames, HashMap<String,HashMap<String,Integer>> chances){
+        this.names = names;
+        this.jobs = jobs;
+        this.priorityNames = priorityNames;
+
+        this.chances = chances;
     }
 
     public static ArrayList<String> nextSundays(int howMany){
@@ -96,6 +106,10 @@ public class Schedule {
                     if(job == jobs.get(jobIdx)){
                         continue;
                     }
+                }
+
+                if(chances != null){
+                    
                 }
                 
                 int nameIdx = (int) (Math.random() * namesCopy.size());
