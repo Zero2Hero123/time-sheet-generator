@@ -5,6 +5,7 @@ import javax.swing.JFrame;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -31,6 +32,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -53,8 +55,10 @@ public class Window extends JFrame implements ActionListener {
     private JTextField jobInput;
     private JButton addJobBtn;
 
-    JPanel taskPercentageContainer;
-    JComboBox<String> nameSelect;
+    private JPanel taskPercentageContainer;
+    private JPanel taskInnerContainer;
+    private JComboBox<String> nameSelect;
+    private String currSelected = "None";
 
     private ArrayList<String> priorityNames = new ArrayList<String>();
     private ArrayList<String> names = new ArrayList<String>();
@@ -66,6 +70,8 @@ public class Window extends JFrame implements ActionListener {
     private int numDays = 5;
 
     private ArrayList<HashMap<String,String>> currSchedule;
+
+    private HashMap<String,HashMap<String,Integer>> chancesOfEachJob = new HashMap<String,HashMap<String,Integer>>();
     
     public Window(){
 
@@ -89,6 +95,13 @@ public class Window extends JFrame implements ActionListener {
                         for(String job : jobs){
                             writer.write(job+",");
                         }
+                        writer.write("\n");
+
+                        for(var jobMap : chancesOfEachJob.values()){
+                            for(int percentage : jobMap.values()){
+                                writer.write(percentage+",");
+                            }
+                        }
 
                         writer.close();
                     } catch(IOException e) {
@@ -107,6 +120,8 @@ public class Window extends JFrame implements ActionListener {
                         for(String job : jobs){
                             writer.write(job+",");
                         }
+
+                        
 
                         writer.close();
                     } catch(IOException e) {
@@ -225,6 +240,7 @@ public class Window extends JFrame implements ActionListener {
         sliderContainer.setBackground(fgColor);
         var daysLabel = new JLabel("<html>Number of<br/> Sundays <br>5</html>");
         daysLabel.setForeground(Color.WHITE);
+        daysSlider.setToolTipText("How many days to Generate");
         daysSlider.addChangeListener((e) -> {
             numDays = daysSlider.getValue();
             
@@ -239,8 +255,14 @@ public class Window extends JFrame implements ActionListener {
         nameSelect.setForeground(Color.WHITE);
         nameSelect.setFocusable(false);
         nameSelect.addItem("None");
+        nameSelect.addActionListener(this);
 
-        
+        taskInnerContainer = new JPanel();
+        taskInnerContainer.setPreferredSize(new Dimension(300, 250));
+        taskInnerContainer.setBackground(fgColor);
+        var taskInnerContainerScroll = new JScrollPane(taskInnerContainer);
+        taskInnerContainerScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
         taskPercentageContainer = new JPanel();
         taskPercentageContainer.setPreferredSize(new Dimension(300, 300));
         taskPercentageContainer.setBackground(fgColor);
@@ -248,6 +270,7 @@ public class Window extends JFrame implements ActionListener {
         percentageLabel.setForeground(Color.WHITE);
         taskPercentageContainer.add(percentageLabel);
         taskPercentageContainer.add(nameSelect);
+        taskPercentageContainer.add(taskInnerContainerScroll);
 
 
         JPanel settingsBody = new JPanel(); // config for time sheet generation
@@ -409,6 +432,43 @@ public class Window extends JFrame implements ActionListener {
             jobInput.setText("");
 
             System.out.println(jobs);
+        } else if(e.getSource() == nameSelect){
+            currSelected = (String) nameSelect.getSelectedItem();
+
+            if(currSelected == "None"){
+                for(int i = 0; i < taskInnerContainer.getComponents().length;i++){
+                    Component comp = taskInnerContainer.getComponents()[i];
+
+                    comp.setEnabled(false);
+                }
+                return;
+            } else {
+                for(int i = 0; i < taskInnerContainer.getComponents().length;i++){
+                    Component comp = taskInnerContainer.getComponents()[i];
+
+                    comp.setEnabled(true);
+                }
+            }
+
+            
+            
+            
+            ArrayList<JSlider> sliders = new ArrayList<JSlider>();
+            for(int i = 0; i < taskInnerContainer.getComponents().length;i++){
+                Component comp = taskInnerContainer.getComponents()[i];
+
+                if(comp instanceof JSlider){
+                    var slider = (JSlider) comp;
+                    
+                    sliders.add(slider);
+                }
+            }
+
+            for(int i=0;i<sliders.size();i++){
+                String jobName = jobs.get(i);
+                    
+                sliders.get(i).setValue(chancesOfEachJob.get(currSelected).get(jobName));
+            }
         }
 
         
@@ -418,6 +478,34 @@ public class Window extends JFrame implements ActionListener {
         try{
             String namesRaw = reader.readLine();
             String jobsRaw = reader.readLine();
+
+
+            // job Assingment Percentage
+            // String[] percentagesRaw = reader.readLine().split(",");
+            // ArrayList<String> jobPercentages = (ArrayList<String>) Arrays.asList(percentagesRaw);
+            // ArrayList<Integer> jobPercentagesAsInt = new ArrayList<>();
+            // jobPercentages.forEach(p -> {
+            //     jobPercentagesAsInt.add(Integer.parseInt(p));
+            // });
+
+            // ArrayList<ArrayList<Integer>> percentagesAsIntProper = new ArrayList<>();
+            // for(int i=0;i<jobPercentagesAsInt.size();i++){
+            //     percentagesAsIntProper.add(new ArrayList<Integer>());
+            // }
+
+            // Iterator<Integer> it = jobPercentagesAsInt.iterator();
+            // int index = 0;
+            // int counter = 0;
+            // while(it.hasNext()){
+            //     percentagesAsIntProper.get(index).add(it.next());
+
+            //     if(counter == 3){
+            //         index++;
+            //         counter = 0;
+            //     }
+
+            // }
+            // Job Assignment Percentage^^^^
 
             if(namesRaw == null || jobsRaw == null){
                 System.out.println("Save-Data File is empty");
@@ -433,6 +521,7 @@ public class Window extends JFrame implements ActionListener {
                 addJob(job);
             }
 
+            
 
             reader.close();
 
@@ -445,6 +534,12 @@ public class Window extends JFrame implements ActionListener {
 
     private void addJob(String jobName){
         jobs.add(jobName);
+
+
+
+        for(String name : names){
+            chancesOfEachJob.get(name).put(jobName,100);
+        }
             
         // add a label and a remove-button for the new job added
         JLabel newJob = new JLabel(jobName);
@@ -457,6 +552,33 @@ public class Window extends JFrame implements ActionListener {
         removeBtn.setBackground(new Color(189, 58, 58));
         removeBtn.setForeground(Color.WHITE);
 
+        // Job Assingment Percentage
+        JLabel percent = new JLabel(String.format("%s: 100%%",jobName));
+        percent.setForeground(Color.WHITE);
+        JSlider chanceOfJobSlider = new JSlider(0,100,100);
+        chanceOfJobSlider.setBackground(fgColor);
+        chanceOfJobSlider.setPreferredSize(new Dimension(270, 30));
+        
+        chanceOfJobSlider.addChangeListener(e -> {
+            int newChance = chanceOfJobSlider.getValue();
+
+            percent.setText(String.format("%s: %d%%",jobName,newChance));
+
+            chancesOfEachJob.get(currSelected).put(jobName,newChance);
+
+            
+        });
+
+        if(currSelected == "None"){
+            percent.setEnabled(false);
+            chanceOfJobSlider.setEnabled(false);
+        }
+
+        taskInnerContainer.add(percent);
+        taskInnerContainer.add(chanceOfJobSlider);
+
+
+
         String currJob = jobName;
         removeBtn.addActionListener((ActionEvent event) -> {
             jobs.remove(currJob);
@@ -464,11 +586,20 @@ public class Window extends JFrame implements ActionListener {
             
             jobsContainer.remove(newJob);
             jobsContainer.remove(removeBtn);
+            
+            for(String name : names){
+                chancesOfEachJob.get(name).remove(currJob);
+            }
+
+            taskInnerContainer.remove(percent);
+            taskInnerContainer.remove(chanceOfJobSlider);
 
             this.invalidate();
             this.validate();
             this.repaint();
         });
+
+        
 
         jobsContainer.add(newJob);
         jobsContainer.add(removeBtn);
@@ -482,6 +613,13 @@ public class Window extends JFrame implements ActionListener {
         names.add(memberName);
         nameSelect.addItem(memberName);
 
+        chancesOfEachJob.put(memberName,new HashMap<String,Integer>());
+
+        for(String job : jobs){
+            chancesOfEachJob.get(memberName).put(job,100);
+        }
+
+        
             
         // add a label and a remove-button for the new job added
         JLabel newName = new JLabel(memberName);
@@ -494,6 +632,7 @@ public class Window extends JFrame implements ActionListener {
         priorityBtn.setBackground(Color.DARK_GRAY);
         priorityBtn.setForeground(Color.WHITE);
         priorityBtn.setFocusable(false);
+        priorityBtn.setToolTipText(String.format("<html>Should <b>%s</b> be included everyday?</html>",memberName));
 
         JButton removeBtn = new JButton("X");
         removeBtn.setPreferredSize(new Dimension(50, 30));
@@ -506,6 +645,7 @@ public class Window extends JFrame implements ActionListener {
             
             priorityNames.remove(currName);
             names.remove(currName);
+            chancesOfEachJob.remove(currName);
             
             
             namesContainer.remove(newName);
