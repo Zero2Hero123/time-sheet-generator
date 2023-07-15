@@ -15,10 +15,16 @@ public class Schedule {
     private HashMap<String,HashMap<String,Integer>> chances;
 
 
-
     public Schedule(ArrayList<String> names, ArrayList<String> jobs){
         this.names = names;
         this.jobs = jobs;
+    }
+
+    public Schedule(ArrayList<String> names, ArrayList<String> jobs,HashMap<String,HashMap<String,Integer>> chances){
+        this.names = names;
+        this.jobs = jobs;
+        
+        this.chances = chances;
     }
 
     public Schedule(ArrayList<String> names, ArrayList<String> jobs,ArrayList<String> priorityNames){
@@ -62,7 +68,7 @@ public class Schedule {
         return nextSundaysFormatted;
     }
 
-    public ArrayList<HashMap<String,String>> generate(int numDays){
+    public ArrayList<HashMap<String,String>> generate(int numDays,boolean percentEnabled){
         var newSchedule = new ArrayList<HashMap<String,String>>();
 
         for(int i=0;i<numDays;i++){
@@ -71,9 +77,9 @@ public class Schedule {
         
         // for each day, generate random
         for(int i = 0; i < numDays; i++){
-            ArrayList<String> namesCopy = new ArrayList<String>();
-            for(String name : names){
-                namesCopy.add(name);
+            ArrayList<String> jobsCopy = new ArrayList<String>();
+            for(String job : jobs){
+                jobsCopy.add(job);
             }
 
             ArrayList<String> priorityNamesCopy = new ArrayList<String>();
@@ -85,43 +91,62 @@ public class Schedule {
 
             Iterator<String> priorityIt = priorityNamesCopy.iterator();
 
-            
-            for(String job : jobs){
-                if(newSchedule.get(i).containsKey(job)){
-                    continue;
+            // generate for priority names with or without percentages
+            while(priorityIt.hasNext()){
+                int jobIdx = (int) (Math.random() * jobsCopy.size());
+
+                String priorityName = priorityIt.next();
+
+                if(percentEnabled){
+                    Chance chance = new Chance();
+
+                    var chosen = chance.rollStr(chances.get(priorityName),jobsCopy);
+
+                    newSchedule.get(i).put(chosen,priorityName);
+
+                    jobsCopy.remove(chosen);
+                } else {
+                    newSchedule.get(i).put(jobsCopy.get(jobIdx),priorityName);
+                    jobsCopy.remove(jobIdx);
                 }
 
-                if(namesCopy.size() == 0){
-                    newSchedule.get(i).put(job,"None");
+                if(jobsCopy.size() == 0){
                     break;
                 }
-
-                if(priorityIt.hasNext()){
-                    int jobIdx = (int) (Math.random() * jobs.size());
-
-                    String priorityName = priorityIt.next();
-                    newSchedule.get(i).put(jobs.get(jobIdx),priorityName);
-                    namesCopy.remove(priorityName);
-
-                    if(job == jobs.get(jobIdx)){
-                        continue;
-                    }
-                }
-
-                if(chances != null){
-                    
-                }
-                
-                int nameIdx = (int) (Math.random() * namesCopy.size());
-
-                newSchedule.get(i).put(job,namesCopy.get(nameIdx));
-                namesCopy.remove(nameIdx);
                 
             }
             
+            Iterator<String> namesIt = names.iterator();
+            //generate for normal names with or without percentages
+            while(namesIt.hasNext()){
+                if(jobsCopy.size() == 0){
+                    break;
+                }
+
+
+                int jobIdx = (int) (Math.random() * jobsCopy.size());
+                String currName = namesIt.next();
+                
+
+                if(percentEnabled){
+                    Chance chance = new Chance();
+
+                    var chosen = chance.rollStr(chances.get(currName),jobsCopy);
+
+                    newSchedule.get(i).put(chosen,currName);
+
+                    jobsCopy.remove(chosen);
+                } else {
+                    newSchedule.get(i).put(jobsCopy.get(jobIdx),currName);
+                    jobsCopy.remove(jobIdx);
+                }
+                    
+            }
+
+            // System.out.println(newSchedule);
+            
             
         }
-
         return newSchedule;
     }
 

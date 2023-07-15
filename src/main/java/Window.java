@@ -1,4 +1,3 @@
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -32,7 +31,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -58,6 +56,7 @@ public class Window extends JFrame implements ActionListener {
     private JPanel taskPercentageContainer;
     private JPanel taskInnerContainer;
     private JComboBox<String> nameSelect;
+    JButton togglePercentagesBtn;
     private String currSelected = "None";
 
     private ArrayList<String> priorityNames = new ArrayList<String>();
@@ -68,6 +67,7 @@ public class Window extends JFrame implements ActionListener {
     private final Color fgColor = new Color(70, 78, 92);
 
     private int numDays = 5;
+    private boolean percentagesEnabled = false;
 
     private ArrayList<HashMap<String,String>> currSchedule;
 
@@ -250,12 +250,34 @@ public class Window extends JFrame implements ActionListener {
         sliderContainer.add(daysSlider);
 
         nameSelect = new JComboBox<String>();
-        nameSelect.setPreferredSize(new Dimension(250, 30));
+        nameSelect.setPreferredSize(new Dimension(225, 30));
         nameSelect.setBackground(fgColor);
         nameSelect.setForeground(Color.WHITE);
         nameSelect.setFocusable(false);
         nameSelect.addItem("None");
         nameSelect.addActionListener(this);
+
+        
+        togglePercentagesBtn = new JButton("Off");
+        togglePercentagesBtn.setPreferredSize(new Dimension(60, 30));
+        togglePercentagesBtn.setBackground(Color.DARK_GRAY);
+        togglePercentagesBtn.setForeground(Color.WHITE);
+        togglePercentagesBtn.setFocusable(false);
+        togglePercentagesBtn.addActionListener(e -> {
+            percentagesEnabled = !percentagesEnabled;
+
+            if(percentagesEnabled){
+                togglePercentagesBtn.setBackground(new Color(56, 138, 78));
+                togglePercentagesBtn.setText("On");
+
+                nameSelect.setSelectedIndex(1);
+            } else {
+                togglePercentagesBtn.setBackground(Color.DARK_GRAY);
+                togglePercentagesBtn.setText("Off");
+                nameSelect.setSelectedItem("None");
+                
+            }
+        });
 
         taskInnerContainer = new JPanel();
         taskInnerContainer.setPreferredSize(new Dimension(300, 250));
@@ -270,6 +292,7 @@ public class Window extends JFrame implements ActionListener {
         percentageLabel.setForeground(Color.WHITE);
         taskPercentageContainer.add(percentageLabel);
         taskPercentageContainer.add(nameSelect);
+        taskPercentageContainer.add(togglePercentagesBtn);
         taskPercentageContainer.add(taskInnerContainerScroll);
 
 
@@ -354,18 +377,23 @@ public class Window extends JFrame implements ActionListener {
             }
 
             ArrayList<String> nextSundayDates = Schedule.nextSundays(numDays);
+            
 
             System.out.println("Generating...");
 
             Schedule newSchedule;
 
             if(priorityNames.size() > 0){
-                newSchedule = new Schedule(names, jobs,priorityNames);
+                newSchedule = (percentagesEnabled) ? new Schedule(names, jobs,priorityNames,chancesOfEachJob) : new Schedule(names, jobs,priorityNames);
             } else {
-                newSchedule = new Schedule(names, jobs);
+                newSchedule = (percentagesEnabled) ? new Schedule(names, jobs,chancesOfEachJob) : new Schedule(names, jobs);
             }
+
             
-            currSchedule = newSchedule.generate(numDays);
+            
+            currSchedule = newSchedule.generate(numDays,percentagesEnabled);
+
+           
             
             int dayIndex = 0;
             int dayCounter = 0;
@@ -433,9 +461,18 @@ public class Window extends JFrame implements ActionListener {
 
             System.out.println(jobs);
         } else if(e.getSource() == nameSelect){
+            String previousState = currSelected;
+
             currSelected = (String) nameSelect.getSelectedItem();
 
+            if(previousState == "None" && currSelected != "None"){
+                percentagesEnabled = true;
+                togglePercentagesBtn.setBackground(new Color(56, 138, 78));
+                togglePercentagesBtn.setText("On");
+            }
+
             if(currSelected == "None"){
+
                 for(int i = 0; i < taskInnerContainer.getComponents().length;i++){
                     Component comp = taskInnerContainer.getComponents()[i];
 
