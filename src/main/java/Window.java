@@ -1,5 +1,6 @@
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 
 import java.awt.BorderLayout;
@@ -51,6 +52,9 @@ public class Window extends JFrame implements ActionListener {
     private JPanel jobsContainer;
     private JTextField jobInput;
     private JButton addJobBtn;
+
+    JPanel taskPercentageContainer;
+    JComboBox<String> nameSelect;
 
     private ArrayList<String> priorityNames = new ArrayList<String>();
     private ArrayList<String> names = new ArrayList<String>();
@@ -127,6 +131,7 @@ public class Window extends JFrame implements ActionListener {
         printBtn.addActionListener(this);
         printBtn.setFocusable(false);
         printBtn.setBackground(new Color(88, 98, 115));
+        printBtn.setEnabled(false);
         printBtn.setForeground(Color.WHITE);
 
         printBtn.addActionListener((e) -> {
@@ -210,12 +215,21 @@ public class Window extends JFrame implements ActionListener {
         sliderContainer.add(daysLabel);
         sliderContainer.add(daysSlider);
 
-        JPanel taskPercentageContainer = new JPanel();
+        nameSelect = new JComboBox<String>();
+        nameSelect.setPreferredSize(new Dimension(250, 30));
+        nameSelect.setBackground(fgColor);
+        nameSelect.setForeground(Color.WHITE);
+        nameSelect.setFocusable(false);
+        nameSelect.addItem("None");
+
+        
+        taskPercentageContainer = new JPanel();
         taskPercentageContainer.setPreferredSize(new Dimension(300, 300));
         taskPercentageContainer.setBackground(fgColor);
         var percentageLabel = new JLabel("Job Assignment Percentage");
         percentageLabel.setForeground(Color.WHITE);
         taskPercentageContainer.add(percentageLabel);
+        taskPercentageContainer.add(nameSelect);
 
 
         JPanel settingsBody = new JPanel(); // config for time sheet generation
@@ -274,6 +288,8 @@ public class Window extends JFrame implements ActionListener {
             if(names.size() == 0 || jobs.size() == 0){
                 return;
             }
+
+            printBtn.setEnabled(true);
 
             Iterator<JPanel> it = sheets.iterator();
             while(it.hasNext()){
@@ -439,6 +455,7 @@ public class Window extends JFrame implements ActionListener {
 
     private void addName(String memberName){
         names.add(memberName);
+        nameSelect.addItem(memberName);
 
             
         // add a label and a remove-button for the new job added
@@ -469,6 +486,8 @@ public class Window extends JFrame implements ActionListener {
             namesContainer.remove(newName);
             namesContainer.remove(priorityBtn);
             namesContainer.remove(removeBtn);
+
+            nameSelect.removeItem(currName);
             
 
             this.invalidate();
@@ -491,6 +510,7 @@ public class Window extends JFrame implements ActionListener {
         namesContainer.add(newName);
         namesContainer.add(priorityBtn);
         namesContainer.add(removeBtn);
+
 
         this.invalidate();
         this.validate();
