@@ -94,6 +94,24 @@ public class Window extends JFrame implements ActionListener {
                     } catch(IOException e) {
                         e.printStackTrace();
                     }
+                } else if(System.getProperty("os.name").startsWith("Mac")){
+                    try {
+                        
+                        BufferedWriter writer = new BufferedWriter(new FileWriter("names_jobs_data.txt"));
+
+                        for(String name : names){
+                            writer.write(name+",");
+                        }
+                        writer.write("\n");
+
+                        for(String job : jobs){
+                            writer.write(job+",");
+                        }
+
+                        writer.close();
+                    } catch(IOException e) {
+                        e.printStackTrace();
+                    }
                 }
                 
             }
@@ -273,10 +291,17 @@ public class Window extends JFrame implements ActionListener {
                 } catch (FileNotFoundException e){
                     System.out.println("ERROR: Save Data Not Found");
                 }
-            } else {
-                System.out.println(false);
             }
 
+        } else if(System.getProperty("os.name").startsWith("Mac")){
+            File file = new File("names_jobs_data.txt");
+            if(file.exists()){
+                try{
+                    loadData(new BufferedReader(new FileReader("names_jobs_data.txt")));
+                } catch (FileNotFoundException e){
+                    System.out.println("ERROR: Save Data Not Found");
+                }
+            }
         }
 
         this.setVisible(true);

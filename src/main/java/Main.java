@@ -23,7 +23,7 @@ public class Main {
 
         // System.out.print(Schedule.nextSundays(5));
 
-
+        System.out.println(System.getProperty("os.name"));
 
         new Window();
 
