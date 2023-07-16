@@ -242,6 +242,10 @@ public class Window extends JFrame implements ActionListener {
         daysLabel.setForeground(Color.WHITE);
         daysSlider.setToolTipText("How many days to Generate");
         daysSlider.addChangeListener((e) -> {
+            double originalVal = daysSlider.getValue();
+
+            daysSlider.setValue((int)(Math.round(originalVal/10) * 10));
+
             numDays = daysSlider.getValue();
             
             daysLabel.setText("<html>Number of<br/> Sundays <br>"+numDays+"</html>");
