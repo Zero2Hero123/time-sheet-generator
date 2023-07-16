@@ -133,6 +133,10 @@ public class Schedule {
 
                     var chosen = chance.rollStr(chances.get(currName),jobsCopy);
 
+                    if(chosen == "None"){
+                        continue;
+                    }
+
                     newSchedule.get(i).put(chosen,currName);
 
                     jobsCopy.remove(chosen);

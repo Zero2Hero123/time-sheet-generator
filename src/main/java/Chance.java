@@ -22,6 +22,7 @@ public class Chance {
     }
 
     public String rollStr(HashMap<String,Integer> percentages,ArrayList<String> jobsInclude){
+
         System.out.println(jobsInclude);
         for(String k : percentages.keySet()){
             if(jobsInclude.contains(k)){
@@ -31,7 +32,11 @@ public class Chance {
             }
         }
 
-        int randIdx = (int) (Math.random() * percentages.size());
+        if(percentageListStr.size() == 0){
+            return "None";
+        }
+
+        int randIdx = (int) (Math.random() * percentageListStr.size());
 
         return percentageListStr.get(randIdx);
     }
