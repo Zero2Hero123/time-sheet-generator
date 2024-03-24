@@ -82,6 +82,8 @@ public class Schedule {
                 jobsCopy.add(job);
             }
 
+            
+
             ArrayList<String> priorityNamesCopy = new ArrayList<String>();
             if(priorityNames != null){
                 for(String name : priorityNames){
@@ -126,6 +128,17 @@ public class Schedule {
 
                 int jobIdx = (int) (Math.random() * jobsCopy.size());
                 String currName = namesIt.next();
+                
+                
+                // find an empty job
+                while(newSchedule.get(i).get(jobsCopy.get(jobIdx)) != null){
+                    jobIdx = (int) (Math.random() * jobsCopy.size());
+                }
+                // find a person who doesnt have a job
+                while(newSchedule.get(i).values().contains(currName)){
+                    System.out.println(currName);
+                    currName = namesIt.next();
+                }
                 
 
                 if(percentEnabled){

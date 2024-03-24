@@ -23,7 +23,7 @@ public class Chance {
 
     public String rollStr(HashMap<String,Integer> percentages,ArrayList<String> jobsInclude){
 
-        System.out.println(jobsInclude);
+        
         for(String k : percentages.keySet()){
             if(jobsInclude.contains(k)){
                 for(int i=0;i<percentages.get(k);i++){
